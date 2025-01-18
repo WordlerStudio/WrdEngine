@@ -110,6 +110,8 @@ func (self *PhysicalObj) CheckCollisionLeft() bool {
 			continue
 		}
 
+		// This condition was to check if the bottom of the player touches the top of the obj, or is in it, if so return true, in order for the player to stop on that object
+		// idk why but it doesn't work so you can fix it yourself if you can lmao
 		if self.X < obj.X+obj.Width && self.X+self.Width > obj.X && self.Y+self.Height > obj.Y && self.Y < obj.Y+obj.Height {
 			return true
 		}
