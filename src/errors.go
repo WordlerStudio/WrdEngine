@@ -6,3 +6,4 @@ type LogicError error
 type ImageLoadError error
 type ImageCreateError error
 type GameError error
+type SceneError error

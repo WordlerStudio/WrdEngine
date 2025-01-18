@@ -1,17 +1,10 @@
 package WrdEngine
 
-type Screen struct {
-	Width, Height int32
-	// TODO...
-}
-
-var screen *Screen
-
-type Physic struct {
-	GravtyPower float64
-	// TODO...
-}
-
-var physic Physic = Physic{
-	GravtyPower: 10,
+type Object interface {
+	Tick()
+	Render() error
+	Connect(event Event, handler func())
+	Attach(addon Addon)
+	ChangePos(x, y int32)
+	Emit(event Event)
 }
