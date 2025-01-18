@@ -15,13 +15,13 @@ type BaseObject struct {
 func NewObj(renderer *sdl.Renderer, imagePath string, x, y int32) (*BaseObject, error) {
 	img, err := sdl.LoadBMP(imagePath)
 	if err != nil {
-		return nil, fmt.Errorf("Image load error: ", err)
+		return nil, ImageLoadError(fmt.Errorf("an error occurred while loading an image: %s", err))
 	}
 	defer img.Free()
 
 	texture, err := renderer.CreateTextureFromSurface(img)
 	if err != nil {
-		return nil, err
+		return nil, ImageLoadError(fmt.Errorf("an error occurred while loading an image: %s", err))
 	}
 
 	return &BaseObject{

@@ -6,7 +6,8 @@ import (
 )
 
 type Player struct {
-	*BaseObject
+	*PhysicalObj
+	velocityY int32
 }
 
 func NewPlayer(renderer *sdl.Renderer, imagePath string, x, y int32) (*Player, error) {
@@ -22,31 +23,55 @@ func NewPlayer(renderer *sdl.Renderer, imagePath string, x, y int32) (*Player, e
 	}
 
 	return &Player{
-		&BaseObject{
-			Texture:  texture,
-			X:        x,
-			Y:        y,
-			Width:    img.W,
-			Height:   img.H,
-			Renderer: renderer,
+		PhysicalObj: &PhysicalObj{
+			BaseObject: &BaseObject{
+				Texture:  texture,
+				X:        x,
+				Y:        y,
+				Width:    img.W,
+				Height:   img.H,
+				Renderer: renderer,
+			},
 		},
+		velocityY: 0,
 	}, nil
 }
 
+var keyState = make(map[sdl.Keycode]bool)
+
 func (self *Player) Tick(event sdl.Event) {
+	self.PhysicTick()
 	switch e := event.(type) {
 	case *sdl.KeyboardEvent:
 		if e.Type == sdl.KEYDOWN {
-			switch e.Keysym.Sym {
-			case sdl.K_UP:
-				self.ChangePos(self.X, self.Y-10)
-			case sdl.K_DOWN:
-				self.ChangePos(self.X, self.Y+10)
-			case sdl.K_LEFT:
-				self.ChangePos(self.X-10, self.Y)
-			case sdl.K_RIGHT:
-				self.ChangePos(self.X+10, self.Y)
-			}
+			keyState[e.Keysym.Sym] = true
+		} else if e.Type == sdl.KEYUP {
+			keyState[e.Keysym.Sym] = false
 		}
+	}
+	self.UpdatePosition()
+}
+
+func (self *Player) UpdatePosition() {
+	const speed = 7
+	const jumpPower = -15
+	const gravity = 1
+
+	if keyState[sdl.K_SPACE] && self.OnGround() && !self.Jumping {
+		self.Jumping = false
+		for i := 10; i > 0; i-- {
+			self.Y -= jumpPower / 10
+		}
+		self.Jumping = true
+	}
+
+	self.velocityY += gravity
+	self.ChangePos(self.X, self.Y+self.velocityY)
+
+	if keyState[sdl.K_a] && self.X-speed >= 0 {
+		self.ChangePos(self.X-speed, self.Y)
+	}
+	if keyState[sdl.K_d] && self.X+speed <= screen.Width-self.Width {
+		self.ChangePos(self.X+speed, self.Y)
 	}
 }
