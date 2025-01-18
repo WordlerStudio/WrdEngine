@@ -84,6 +84,9 @@ func (self *PhysicalObj) PhysicTick() {
 	if !self.OnGround() && !self.LockPosition {
 		self.Y += int32(physic.GravtyPower)
 	}
+	if self.Y > 600 {
+		self.Y = 600
+	}
 }
 
 func (self *PhysicalObj) OnGround() bool {
@@ -93,7 +96,7 @@ func (self *PhysicalObj) OnGround() bool {
 		}
 
 		if self.X < obj.X+obj.Width && self.X+self.Width > obj.X &&
-			self.Y+self.Height == obj.Y {
+			self.Y+self.Height <= obj.Y+1 && self.Y+self.Height >= obj.Y {
 			return true
 		}
 	}

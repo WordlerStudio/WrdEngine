@@ -3,6 +3,7 @@ package WrdEngine
 import (
 	"fmt"
 	"github.com/veandco/go-sdl2/sdl"
+	"log"
 )
 
 type Player struct {
@@ -40,29 +41,24 @@ func NewPlayer(renderer *sdl.Renderer, imagePath string, x, y int32) (*Player, e
 var keyState = make(map[sdl.Keycode]bool)
 
 func (self *Player) Tick(event sdl.Event) {
+	keys := sdl.GetKeyboardState()
+	keyState[sdl.K_SPACE] = keys[sdl.SCANCODE_SPACE] != 0
+	keyState[sdl.K_a] = keys[sdl.SCANCODE_A] != 0
+	keyState[sdl.K_d] = keys[sdl.SCANCODE_D] != 0
 	self.PhysicTick()
-	switch e := event.(type) {
-	case *sdl.KeyboardEvent:
-		if e.Type == sdl.KEYDOWN {
-			keyState[e.Keysym.Sym] = true
-		} else if e.Type == sdl.KEYUP {
-			keyState[e.Keysym.Sym] = false
-		}
-	}
-	self.UpdatePosition()
-}
-
-func (self *Player) UpdatePosition() {
 	const speed = 7
 	const jumpPower = -15
 	const gravity = 1
 
+	log.Printf("Player: %v", *self)
+	log.Printf("OnGround? %v", self.OnGround())
 	if keyState[sdl.K_SPACE] && self.OnGround() && !self.Jumping {
-		self.Jumping = false
-		for i := 10; i > 0; i-- {
-			self.Y -= jumpPower / 10
-		}
+		log.Printf("Jumping, btw: %v", self)
 		self.Jumping = true
+		for i := 10; i > 0; i-- {
+			self.Y += jumpPower / 10
+		}
+		self.Jumping = false
 	}
 
 	self.velocityY += gravity
